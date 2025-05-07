@@ -27,15 +27,20 @@ y = data[target]
 x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=2024)
 
 # Các cột số
-numeric_features = ["cylinders", "displacement", "horsepower", "weight", "acceleration", "model year", "origin"]
+numeric_features = ["displacement", "horsepower", "weight", "acceleration"]
 num_transformer = Pipeline(steps=[
     ("imputer", SimpleImputer(strategy="median")),
     ("scaler", StandardScaler()),
 ])
 
+nom_transformer = Pipeline(steps=[
+    ("imputer", SimpleImputer(strategy="most_frequent")),
+    ("encoder", OneHotEncoder(sparse_output=False))
+])
 # Tiền xử lý
 preprocessor = ColumnTransformer(transformers=[
-    ("num", num_transformer, numeric_features)
+    ("num", num_transformer, numeric_features),
+    ("nom_features", nom_transformer, ["cylinders", "origin", "model year"])
 ])
 
 # Pipeline gồm tiền xử lý và mô hình
@@ -56,13 +61,13 @@ print("MSE: {:.2f}".format(mean_squared_error(y_test, y_predict)))
 print("R2: {:.2f}".format(r2_score(y_test, y_predict)))
 
 new_data = pd.DataFrame([[
-    4,          # cylinders
+    8,          # cylinders
     120.0,      # displacement
     88.0,       # horsepower
     2500,       # weight
     15.0,       # acceleration
     82,         # model year
-    1           # origin
+    2           # origin
 ]], columns=["cylinders", "displacement", "horsepower", "weight", "acceleration", "model year", "origin"])
 
 # Dự đoán MPG cho dữ liệu mới
