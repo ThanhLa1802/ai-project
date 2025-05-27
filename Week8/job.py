@@ -6,6 +6,7 @@ from sklearn.compose import ColumnTransformer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import classification_report
+from sklearn.model_selection import GridSearchCV
 
 def filter_location(location):
     if ", " in location:
@@ -26,7 +27,7 @@ x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_
 preprocessor = ColumnTransformer(transformers=[
     ("title", TfidfVectorizer(), "title"),
     ("location", OneHotEncoder(handle_unknown="ignore"), ["location"]),
-    ("description", TfidfVectorizer(ngram_range=(1,2), stop_words="english"), "description"),
+    ("description", TfidfVectorizer(ngram_range=(1,2), stop_words="english", min_df=0.01, max_df=0.99), "description"),
     ("function", OrdinalEncoder(), ["function"]),
     ("industry", TfidfVectorizer(stop_words="english"), "industry")
 ])
